@@ -29,6 +29,21 @@ const livros = [
   }  
 ]
 
+const comentarios = [
+  {
+    id: '1001',
+    texto: 'excelente',
+    nota: 5,
+    livro: '101'
+  },
+  {
+    id: '1002',
+    texto: 'Gostei muito',
+    nota: 5,
+    livro: '101'
+  }
+]
+
 const schema = createSchema({
   typeDefs: `
     type Pessoa{
@@ -41,18 +56,22 @@ const schema = createSchema({
       id: ID!
       titulo: String!
       edicao: Int!
-      autor: Pessoa!  
+      autor: Pessoa!
+      comentarios: [Comentario!]!  
     }
     type Comentario{
       id: ID!
       texto: String!
       nota: Int!
+      livro: Livro!
     }
     type Query {
       livros: [Livro!]!
       pessoas: [Pessoa!]!
+      comentarios: [Comentario!]!
     }
-  `,
+    `,
+    //1. Dizer que a operação de busca de comentários existe
   resolvers: {
     Query: {
       livros(){
@@ -60,6 +79,9 @@ const schema = createSchema({
       },
       pessoas(){
         return pessoas
+      },
+      comentarios(){
+        return comentarios
       }  
     },
     Livro: {
@@ -67,6 +89,9 @@ const schema = createSchema({
         //devolver o objeto pessoa cujo id seja igual ao valor existente em parent.autor
         //dica: use a função find do javascript para operar sobre a coleção pessoas
         return pessoas.find(p => p.id === parent.autor)  
+      },
+      comentarios(parent, args, ctx, info){
+        return comentarios.filter(c => c.livro === parent.id)
       }  
     },
     Pessoa: {
@@ -78,9 +103,16 @@ const schema = createSchema({
       livros(parent, args, ctx, info){
         return livros.filter(l => l.autor === parent.id)
       }
+    },
+    Comentario: {
+      livro (parent, args, ctx, info){
+        return livros.find( livro => livro.id === parent.livro)  
+      }  
     }
   }
 })
+
+//2. Escrever o resolver que a implementa
 
 const yoga = createYoga({
   schema
