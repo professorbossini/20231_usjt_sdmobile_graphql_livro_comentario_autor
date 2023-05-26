@@ -34,13 +34,15 @@ const comentarios = [
     id: '1001',
     texto: 'excelente',
     nota: 5,
-    livro: '101'
+    livro: '101',
+    autor: '1'
   },
   {
     id: '1002',
     texto: 'Gostei muito',
     nota: 5,
-    livro: '101'
+    livro: '101',
+    autor: '1'
   }
 ]
 
@@ -51,6 +53,7 @@ const schema = createSchema({
       nome: String!
       idade: Int
       livros: [Livro!]!
+      comentarios: [Comentario!]!
     }
     type Livro{
       id: ID!
@@ -64,6 +67,7 @@ const schema = createSchema({
       texto: String!
       nota: Int!
       livro: Livro!
+      autor: Pessoa!
     }
     type Query {
       livros: [Livro!]!
@@ -102,11 +106,17 @@ const schema = createSchema({
       //somente devem ser incluidos os livros pertencentes a essa pessoa
       livros(parent, args, ctx, info){
         return livros.filter(l => l.autor === parent.id)
+      },
+      comentarios(parent, args, ctx, info){
+        return comentarios.filter(c => c.autor === parent.id)
       }
     },
     Comentario: {
       livro (parent, args, ctx, info){
         return livros.find( livro => livro.id === parent.livro)  
+      },
+      autor(parent, args, ctx, info){
+        return pessoas.find(p => p.id === parent.autor)  
       }  
     }
   }
